@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" 
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+        <title>Photo & Sign Detection</title>
+    </head>
+    <body>
+        <br><br><br>
+        <div class="card" style="margin-left:250px;
+                                 width:1000px;
+                                 height: 80px;
+                                 border-top-left-radius: 8px;
+                                 border-top-right-radius: 8px;">
+            <table class="table">
+                <thead>
+                    <td>
+                        Recently Predicted Data
+                    </td>
+                </thead>
+                <thead>
+                    <td style="width: 200px;text-align: center;">Uploaded Date</td>
+                    <td style="width: 150px;text-align: center;">Uploaded Time</td>
+                    <td style="width: 285px;text-align: center;">Uploaded Image</td>
+                    <td style="width: 285px;text-align: center;">Prediction(Photograph Or Signature)</td>
+                </thead>
+            </table>
+        </div>
+        <div class="card" style="margin-left:250px;
+                                 width:1000px;
+                                 height: 515px;
+                                 overflow-y: scroll;
+                                 overflow-x:hidden;
+                                 border-bottom-left-radius: 8px;
+                                 border-bottom-right-radius: 8px;" ::-webkit-scrollbar { width: 18px; }
+                                                                ::-webkit-scrollbar-track {
+                                                                    box-shadow: inset 0 0 5px #7d2ae8; 
+                                                                    border-radius: 10px;
+                                                                }
+                                                                ::-webkit-scrollbar-thumb {
+                                                                    background:#7d2ae8;
+                                                                    box-shadow: inset 0 0 5px #7d2ae8;  
+                                                                    border-radius: 10px;
+                                                                    height: 100px;
+                                                                }
+                                                                ::-webkit-scrollbar-thumb:hover {
+                                                                    background: #8227f9; 
+                                                                }>
+            <table class="table" id="my-table">
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="card" style="margin-left:250px;
+                                 width:1000px;
+                                 height: 80px;
+                                 border-top-left-radius: 8px;
+                                 border-top-right-radius: 8px;">
+            
+            <form name="form" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table class="table">
+                    <thead>
+                        <td> Upload Image </td>
+                        <td>
+                            <input type="file" name="upload" accept="image/*" required>
+                        </td>
+                        <td>
+                            <input class="btn btn-primary" type="submit" value="Submit">
+                        </td>
+                    </thead>
+                </table>
+            </form>
+        </div>
+    </body>
+    <script>
+        var json_data = JSON.parse('{{ json_array|escapejs }}');
+        const tableBody = document.querySelector('#my-table tbody');
+        for(const obj of json_data) {
+            const newRow = document.createElement('tr');
+            const dateCell = document.createElement('td');
+            dateCell.textContent = obj.uploaded_date;
+            dateCell.style.width = "200px";
+            dateCell.style.textAlign = "center";
+            dateCell.style.padding = "70px 0";
+            const timeCell = document.createElement('td');
+            timeCell.textContent = obj.uploaded_time;
+            timeCell.style.width = "150px";
+            timeCell.style.textAlign = "center";
+            timeCell.style.padding = "70px 0";
+            const imageCell = document.createElement('td');
+            var img = document.createElement('img');
+            img.style.width = "250px";
+            img.style.maxHeight = "250px";
+            const decodedData = atob(obj.image);
+            img.src = 'data:image/jpeg;base64,' + btoa(decodedData);
+            imageCell.style.width = "285px";
+            imageCell.style.textAlign = "center";
+            imageCell.appendChild(img);
+            const valueCell = document.createElement('td');
+            valueCell.textContent = obj.predicted_value;
+            valueCell.style.width = "285px";
+            valueCell.style.textAlign = "center";
+            valueCell.style.padding = "70px 0";
+            newRow.appendChild(dateCell);
+            newRow.appendChild(timeCell);
+            newRow.appendChild(imageCell);
+            newRow.appendChild(valueCell);
+            tableBody.appendChild(newRow);
+        }
+    </script>
+</html>
